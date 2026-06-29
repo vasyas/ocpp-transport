@@ -16,8 +16,6 @@ export interface ClientOptions extends SessionOptions {
   url: string
   /** Offered WebSocket subprotocol(s), e.g. "ocpp1.6". */
   protocols?: string | string[]
-  /** Connection identity used in listener context (defaults to the URL). */
-  id?: string
   /** Inbound OCPP handlers (server-initiated calls). */
   local?: LocalHandlers
   /** Local middleware wrapping inbound-handler dispatch. */
@@ -71,7 +69,7 @@ export function createClient<R = any>(options: ClientOptions): Client<R> {
   })
 
   const baseCtx: ConnectionContext = {
-    id: options.id ?? options.url,
+    id: options.url,
     protocol: Array.isArray(options.protocols)
       ? options.protocols[0]
       : options.protocols,
