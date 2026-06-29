@@ -1,23 +1,33 @@
 {
   "name": "ocpp-transport",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "OCPP-J (OCPP-over-WebSocket) transport: a small, version-agnostic typed client and server.",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "browser": "./dist/browser.js",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "browser": {
+        "types": "./dist/browser.d.ts",
+        "import": "./dist/browser.js",
+        "require": "./dist/browser.cjs"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -41,6 +51,7 @@
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/ws": "^8.5.13",
+    "tsup": "^8.5.1",
     "typescript": "^5.7.0",
     "vitest": "^2.1.0",
     "ws": "^8.18.0"
