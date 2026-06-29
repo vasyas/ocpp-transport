@@ -152,6 +152,34 @@ describe("U9: upgrade rejection", () => {
   })
 })
 
+describe("client handshake headers (Node)", () => {
+  it("sends Authorization/custom headers the hook can read", async () => {
+    let seenAuth: string | undefined
+    let seenCharger: string | undefined
+    server = createServer({
+      port: 0,
+      hook: (req) => {
+        seenAuth = req.headers["authorization"] as string | undefined
+        seenCharger = req.headers["x-charger-id"] as string | undefined
+        return { ok: true, context: { id: "CPH" } }
+      },
+    })
+    const port = await new Promise<number>((r) =>
+      server!.httpServer.on("listening", () =>
+        r((server!.httpServer.address() as AddressInfo).port),
+      ),
+    )
+    const c = createClient({
+      url: `ws://127.0.0.1:${port}/CPH`,
+      headers: { Authorization: "Basic Zm9vOmJhcg==", "x-charger-id": "HW9" },
+    })
+    clients.push(c)
+    await c.connected
+    expect(seenAuth).toBe("Basic Zm9vOmJhcg==")
+    expect(seenCharger).toBe("HW9")
+  })
+})
+
 describe("F3: reconnect after drop", () => {
   it("re-establishes after the server drops the connection", async () => {
     const port = await start(acceptAs("CP4"))

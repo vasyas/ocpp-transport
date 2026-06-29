@@ -7,8 +7,12 @@ import { wrapWs } from "./wrapWs.js"
  * `onUnexpectedResponse` channel so a rejected upgrade's HTTP status reaches
  * the caller — `ws` fires this as a distinct event from `error`.
  */
-export const nodeClientSocket: ClientSocketFactory = (url, protocols) => {
-  const ws = new WebSocket(url, protocols)
+export const nodeClientSocket: ClientSocketFactory = (url, protocols, opts) => {
+  const ws = new WebSocket(
+    url,
+    protocols,
+    opts?.headers ? { headers: opts.headers } : undefined,
+  )
   const base = wrapWs(ws)
   const socket: Socket = {
     ...base,

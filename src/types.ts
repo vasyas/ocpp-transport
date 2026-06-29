@@ -112,10 +112,21 @@ export interface Socket {
   onUnexpectedResponse?(handler: (status: number, message: string) => void): void
 }
 
+/** Per-connection options passed to a client socket factory. */
+export interface ClientSocketOptions {
+  /**
+   * Extra HTTP headers for the WebSocket handshake (e.g. `Authorization` for
+   * OCPP Security Profile 1 Basic Auth). Node only — the browser `WebSocket`
+   * API cannot set request headers, so the browser factory ignores these.
+   */
+  headers?: Record<string, string>
+}
+
 /** Factory that opens a client socket to `url` with optional subprotocols. */
 export type ClientSocketFactory = (
   url: string,
   protocols?: string | string[],
+  opts?: ClientSocketOptions,
 ) => Socket
 
 /**

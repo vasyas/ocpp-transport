@@ -18,6 +18,7 @@ export type {
   MessageSerializer,
   Socket,
   ClientSocketFactory,
+  ClientSocketOptions,
   SessionOptions,
   CallOptions,
   Listeners,

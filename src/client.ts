@@ -26,6 +26,11 @@ export interface ClientOptions extends SessionOptions {
   reconnectDelay?: number
   /** Override the socket factory (e.g. to force the browser or a mock). */
   socket?: ClientSocketFactory
+  /**
+   * Extra handshake headers (Node only), e.g. `{ Authorization: "Basic ..." }`
+   * for OCPP Security Profile 1. Ignored by the browser socket.
+   */
+  headers?: Record<string, string>
   /** Notified when the server rejects the upgrade with an HTTP status. */
   onUpgradeRejected?: (status: number, message: string) => void
 }
@@ -115,7 +120,9 @@ export function createClientCore<R = any>(
 
   async function connectOnce(): Promise<void> {
     const factory = options.socket ?? (await resolveDefaultFactory())
-    const socket = factory(options.url, options.protocols)
+    const socket = factory(options.url, options.protocols, {
+      headers: options.headers,
+    })
 
     socket.onUnexpectedResponse?.((status, message) => {
       options.onUpgradeRejected?.(status, message)

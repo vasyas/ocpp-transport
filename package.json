@@ -1,6 +1,6 @@
 {
   "name": "ocpp-transport",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "OCPP-J (OCPP-over-WebSocket) transport: a small, version-agnostic typed client and server.",
   "type": "module",
   "main": "./dist/index.js",

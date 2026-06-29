@@ -8,6 +8,8 @@ import type { ClientSocketFactory, Socket } from "../types.js"
  * error via `onError`.
  */
 export const browserClientSocket: ClientSocketFactory = (url, protocols) => {
+  // `opts.headers` is intentionally ignored — the browser WebSocket API cannot
+  // set handshake headers.
   const ws = new WebSocket(url, protocols)
   const socket: Socket = {
     send(data) {
