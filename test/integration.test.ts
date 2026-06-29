@@ -1,7 +1,8 @@
 import { describe, it, expect, afterEach } from "vitest"
 import type { AddressInfo } from "node:net"
 import { createServer, type Server } from "../src/server.js"
-import { createClient, type Client } from "../src/client.js"
+import { createClient } from "../src/index.js"
+import type { Client } from "../src/client.js"
 import type { UpgradeHook } from "../src/types.js"
 
 let server: Server | undefined

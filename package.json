@@ -1,6 +1,6 @@
 {
   "name": "ocpp-transport",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "OCPP-J (OCPP-over-WebSocket) transport: a small, version-agnostic typed client and server.",
   "type": "module",
   "main": "./dist/index.js",
@@ -8,7 +8,9 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "browser": "./dist/browser.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
   "files": [
@@ -28,14 +30,20 @@
     "ev-charging"
   ],
   "license": "MIT",
-  "dependencies": {
+  "peerDependencies": {
     "ws": "^8.18.0"
+  },
+  "peerDependenciesMeta": {
+    "ws": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/ws": "^8.5.13",
     "typescript": "^5.7.0",
-    "vitest": "^2.1.0"
+    "vitest": "^2.1.0",
+    "ws": "^8.18.0"
   },
   "engines": {
     "node": ">=18"

@@ -7,8 +7,7 @@ import {
   type SessionOptions,
   type CallOptions,
 } from "./types.js"
-import { Session, createRemoteProxy, ClosedError } from "./session.js"
-import { browserClientSocket } from "./socket/browserClient.js"
+import { Session, ClosedError } from "./session.js"
 import { log } from "./logger.js"
 
 export interface ClientOptions extends SessionOptions {
@@ -47,22 +46,21 @@ function chargePointIdFromUrl(url: string): string {
   return segment || url
 }
 
-async function defaultFactory(): Promise<ClientSocketFactory> {
-  const isBrowser =
-    typeof window !== "undefined" &&
-    typeof (window as { document?: unknown }).document !== "undefined"
-  if (isBrowser) return browserClientSocket
-  const { nodeClientSocket } = await import("./socket/nodeClient.js")
-  return nodeClientSocket
-}
+/** Resolves the default socket factory when `options.socket` is not given. */
+export type DefaultSocketResolver = () =>
+  | ClientSocketFactory
+  | Promise<ClientSocketFactory>
 
 /**
- * Create an OCPP-J client. Connects to `url`, exposes a typed `remote` proxy
- * for outbound calls, dispatches inbound calls to `local`, and (when enabled)
- * auto-reconnects after a drop. On Node the native ping defaults on to bound
- * dead-connection detection latency; in the browser it is unavailable.
+ * Core client implementation. The default socket factory is injected so this
+ * module never references the Node (`ws`) or browser socket directly — the
+ * `index` (Node) and `browser` entry points each bind the right one. Browser
+ * builds therefore never pull `ws` into their graph.
  */
-export function createClient<R = any>(options: ClientOptions): Client<R> {
+export function createClientCore<R = any>(
+  options: ClientOptions,
+  resolveDefaultFactory: DefaultSocketResolver,
+): Client<R> {
   let session: Session | null = null
   let intentionalClose = false
   let firstAttemptPending = true
@@ -121,7 +119,7 @@ export function createClient<R = any>(options: ClientOptions): Client<R> {
   }
 
   async function connectOnce(): Promise<void> {
-    const factory = options.socket ?? (await defaultFactory())
+    const factory = options.socket ?? (await resolveDefaultFactory())
     const socket = factory(options.url, options.protocols)
 
     socket.onUnexpectedResponse?.((status, message) => {

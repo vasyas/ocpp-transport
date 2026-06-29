@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto"
 import {
   MessageType,
   type CallOptions,
@@ -17,6 +16,7 @@ import {
   toCallErrorFrame,
 } from "./errors.js"
 import { runLocal } from "./middleware.js"
+import { newId } from "./id.js"
 import { log } from "./logger.js"
 
 /** Rejection reason for a call that did not get a response in time. */
@@ -167,7 +167,7 @@ export class Session {
     if (!this.open || this.closed || this.inflight) return
     const c = this.queue.shift()
     if (!c) return
-    c.id = randomUUID()
+    c.id = newId()
     this.inflight = c
     this.send([MessageType.Call, c.id, c.action, c.payload])
   }

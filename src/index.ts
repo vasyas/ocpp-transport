@@ -38,11 +38,24 @@ export { nodeClientSocket } from "./socket/nodeClient.js"
 export { browserClientSocket } from "./socket/browserClient.js"
 export type { UpgradeDecision, UpgradeHook } from "./types.js"
 
-export { createClient } from "./client.js"
 export type { Client, ClientOptions } from "./client.js"
 export { createServer } from "./server.js"
 export type { Server, ServerOptions } from "./server.js"
 export { TimeoutError, ClosedError } from "./session.js"
+
+import { createClientCore, type Client, type ClientOptions } from "./client.js"
+
+/**
+ * Create an OCPP-J client. On Node the `ws`-backed socket is loaded lazily via
+ * dynamic import, so it stays out of the synchronous module graph (and out of
+ * browser builds, which use the separate `browser` entry point).
+ */
+export function createClient<R = any>(options: ClientOptions): Client<R> {
+  return createClientCore<R>(
+    options,
+    async () => (await import("./socket/nodeClient.js")).nodeClientSocket,
+  )
+}
 
 // Public surface added by later units:
 //   export { createClient } from "./client.js"

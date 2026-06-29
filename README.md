@@ -10,8 +10,17 @@ It is a focused replacement for `@push-rpc/core` in OCPP projects: no
 subscriptions, no extra adapters, one package.
 
 ```bash
+# Node (server and/or client) — ws is an optional peer dependency:
+npm install ocpp-transport ws
+
+# Browser (client only) — no ws needed:
 npm install ocpp-transport
 ```
+
+`ws` is **not** a hard dependency. Node usage (the server, and the default Node
+client socket) needs it, so install it alongside. Browser bundlers resolve the
+package's `browser` entry automatically — it never references `ws` or Node core
+modules, so nothing extra is required client-side.
 
 ## Server
 
@@ -58,9 +67,11 @@ await client.connected
 const res = await client.remote.Authorize({ idTag: "TAG-1" })
 ```
 
-The client runs in the browser too — pass `browserClientSocket` or let it
-auto-detect. Native ping is Node-only; the browser relies on idle-timeout
-liveness plus whatever traffic the app sends.
+The client runs in the browser too: bundlers pick the `browser` entry
+automatically (which uses the global `WebSocket` and pulls in no `ws`). Native
+ping is Node-only; the browser relies on idle-timeout liveness plus whatever
+traffic the app sends. In a Node process you can still force the browser socket
+by passing `socket: browserClientSocket`.
 
 See [`examples/`](examples) for runnable client and server, and
 [`examples/PARITY.md`](examples/PARITY.md) for the `@push-rpc/core` migration map.
