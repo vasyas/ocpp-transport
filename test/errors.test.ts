@@ -5,8 +5,8 @@ import {
   buildReceivedError,
   sanitizeDetails,
   resolveHandler,
-} from "./errors.js"
-import { MessageType, type LocalHandlers } from "./types.js"
+} from "../src/errors.js"
+import { MessageType, type LocalHandlers } from "../src/types.js"
 
 describe("error serialization (AE2)", () => {
   it("serializes code, message, and explicit details", () => {

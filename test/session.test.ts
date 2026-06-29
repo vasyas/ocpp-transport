@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest"
-import { Session, createRemoteProxy, TimeoutError } from "./session.js"
-import { MessageType, type ConnectionContext, type Socket } from "./types.js"
+import { Session, createRemoteProxy, TimeoutError } from "../src/session.js"
+import { MessageType, type ConnectionContext, type Socket } from "../src/types.js"
 
 function mockSocket() {
   let openH: (() => void) | undefined

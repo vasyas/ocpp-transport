@@ -1,8 +1,8 @@
 import { describe, it, expect, afterEach } from "vitest"
 import type { AddressInfo } from "node:net"
-import { createNodeServer, type NodeServerHandle } from "./nodeServer.js"
-import { nodeClientSocket } from "./nodeClient.js"
-import type { ConnectionContext, Socket } from "../types.js"
+import { createNodeServer, type NodeServerHandle } from "../src/socket/nodeServer.js"
+import { nodeClientSocket } from "../src/socket/nodeClient.js"
+import type { ConnectionContext, Socket } from "../src/types.js"
 
 let server: NodeServerHandle | undefined
 afterEach(async () => {

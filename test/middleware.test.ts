@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
-import { composeMiddleware, runLocal } from "./middleware.js"
-import { MessageType, type ConnectionContext, type Middleware } from "./types.js"
+import { composeMiddleware, runLocal } from "../src/middleware.js"
+import { MessageType, type ConnectionContext, type Middleware } from "../src/types.js"
 
 const ctx: ConnectionContext = { id: "cp1" }
 

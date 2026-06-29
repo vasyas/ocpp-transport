@@ -5,8 +5,8 @@ import {
   FrameError,
   isoDateReviver,
   defaultMessageParser,
-} from "./codec.js"
-import { MessageType } from "./types.js"
+} from "../src/codec.js"
+import { MessageType } from "../src/types.js"
 
 describe("codec encode/decode", () => {
   it("round-trips a CALL frame", () => {

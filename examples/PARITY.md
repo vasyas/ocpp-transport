@@ -32,7 +32,7 @@ their `ocpp-transport` equivalents, so migration is mechanical. The wire format
 
 Representative consumer behaviors are exercised by the test suite:
 
-- **Custom parser** repairing a malformed vendor frame — `src/codec.test.ts`.
-- **Serialized outbound** (AE/ABL chargers can't take concurrent CALLs) — `src/session.test.ts`.
-- **Identity derivation from the upgrade request** + subprotocol echo — `src/socket/socket.test.ts`, `src/integration.test.ts`.
-- **Inbound dispatch + outbound `getRemote` + reconnect** end-to-end — `src/integration.test.ts`.
+- **Custom parser** repairing a malformed vendor frame — `test/codec.test.ts`.
+- **Serialized outbound** (AE/ABL chargers can't take concurrent CALLs) — `test/session.test.ts`.
+- **Identity derivation from the upgrade request** + subprotocol echo — `test/socket.test.ts`, `test/integration.test.ts`.
+- **Inbound dispatch + outbound `getRemote` + reconnect** end-to-end — `test/integration.test.ts`.
