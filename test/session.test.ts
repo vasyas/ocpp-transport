@@ -222,4 +222,37 @@ describe("remote proxy", () => {
     m.inbound([MessageType.CallResult, frame[1], "ok"])
     await expect(p).resolves.toBe("ok")
   })
+
+  it("is not thenable — awaiting the proxy does not fire a `then` call", async () => {
+    const m = mockSocket()
+    const s = new Session(m.socket, ctx, {})
+    m.fireOpen()
+    const remote = createRemoteProxy(s)
+    // Awaiting a promise that resolves to the proxy must NOT treat it as a
+    // thenable (which would call `remote.then`, sending a bogus OCPP call).
+    const resolved = await Promise.resolve(remote)
+    expect(resolved).toBe(remote)
+    expect((remote as any).then).toBeUndefined()
+    expect(m.sent).toHaveLength(0)
+  })
+})
+
+describe("middleware per-call context", () => {
+  it("exposes the action name to local middleware", async () => {
+    const m = mockSocket()
+    let seenAction: string | undefined
+    const s = new Session(m.socket, ctx, {
+      local: { Authorize: () => ({ status: "Accepted" }) },
+      middleware: [
+        async (c, next, p) => {
+          seenAction = c.action
+          return next(p)
+        },
+      ],
+    })
+    m.fireOpen()
+    m.inbound([MessageType.Call, "r", "Authorize", {}])
+    await vi.waitFor(() => expect(m.sent).toHaveLength(1))
+    expect(seenAction).toBe("Authorize")
+  })
 })

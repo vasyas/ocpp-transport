@@ -89,6 +89,18 @@ describe("F2: outbound server -> charger via getRemote", () => {
     await start(acceptAs("CPx"))
     await expect(server!.getRemote("ghost").Anything({})).rejects.toThrow(/not connected/)
   })
+
+  it("survives being awaited (bill's getDownStreamClient pattern)", async () => {
+    const port = await start(acceptAs("CPA"))
+    connect(port, "/CPA", { local: { Ping: () => ({ pong: true }) } })
+    await new Promise<void>((r) => {
+      const t = setInterval(() => server!.isConnected("CPA") && (clearInterval(t), r()), 10)
+    })
+    // Mirror bill: an async fn returns the proxy, the caller awaits it.
+    const getConn = async () => server!.getRemote("CPA")
+    const conn = await getConn()
+    await expect(conn.Ping({})).resolves.toEqual({ pong: true })
+  })
 })
 
 describe("U9: registry + connection management", () => {

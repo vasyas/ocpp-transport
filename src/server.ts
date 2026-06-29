@@ -7,7 +7,7 @@ import {
   type SessionOptions,
   type UpgradeHook,
 } from "./types.js"
-import { Session } from "./session.js"
+import { Session, createCallProxy } from "./session.js"
 import { createNodeServer } from "./socket/nodeServer.js"
 
 export interface ServerOptions extends SessionOptions {
@@ -83,17 +83,13 @@ export function createServer(options: ServerOptions): Server {
 
   return {
     getRemote<R = any>(id: string): R {
-      return new Proxy(Object.create(null), {
-        get(_t, action: string) {
-          return (payload: unknown, opts?: CallOptions) => {
-            const s = registry.get(id)
-            if (!s) {
-              return Promise.reject(new Error(`Charger '${id}' is not connected`))
-            }
-            return s.call(action, payload, opts)
-          }
-        },
-      }) as R
+      return createCallProxy<R>((action, payload, opts) => {
+        const s = registry.get(id)
+        if (!s) {
+          return Promise.reject(new Error(`Charger '${id}' is not connected`))
+        }
+        return s.call(action, payload, opts)
+      })
     },
     isConnected: (id) => registry.has(id),
     getConnectedIds: () => [...registry.keys()],

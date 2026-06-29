@@ -246,13 +246,16 @@ export class Session {
       ])
       return
     }
+    // Per-call context carries the action name so middleware (e.g. metering)
+    // can label by operation. It's a per-invocation copy of the connection ctx.
+    const callCtx: ConnectionContext = { ...this.ctx, action }
     try {
       const result = await runLocal(
         this.middleware,
-        this.ctx,
+        callCtx,
         payload,
         MessageType.Call,
-        (p) => Promise.resolve(handler(p as any, this.ctx)),
+        (p) => Promise.resolve(handler(p as any, callCtx)),
       )
       this.send([MessageType.CallResult, id, result ?? null])
     } catch (err) {
@@ -301,14 +304,29 @@ export class Session {
 }
 
 /**
- * Build the typed proxy whose property access becomes a serialized outbound
- * call: `remote.Authorize(payload)` or `remote[action](payload)`.
+ * Build a typed proxy whose property access becomes an outbound call:
+ * `proxy.Authorize(payload)` or `proxy[action](payload)`.
+ *
+ * Crucially, `then` and symbol properties resolve to `undefined` so the proxy
+ * is NOT thenable — `await proxy` (or returning it from an async function)
+ * cannot be mistaken for a promise and fire a bogus `then` call.
  */
-export function createRemoteProxy<R = any>(session: Session): R {
+export function createCallProxy<R = any>(
+  invoke: (action: string, payload: unknown, opts?: CallOptions) => Promise<unknown>,
+): R {
   return new Proxy(Object.create(null), {
-    get(_t, action: string) {
+    get(_t, prop) {
+      if (typeof prop !== "string" || prop === "then") return undefined
+      const action = prop
       return (payload: unknown, opts?: CallOptions) =>
-        session.call(action, payload, opts)
+        invoke(action, payload, opts)
     },
   }) as R
+}
+
+/** Build the typed proxy for a session's outbound calls. */
+export function createRemoteProxy<R = any>(session: Session): R {
+  return createCallProxy<R>((action, payload, opts) =>
+    session.call(action, payload, opts),
+  )
 }

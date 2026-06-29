@@ -7,7 +7,7 @@ import {
   type SessionOptions,
   type CallOptions,
 } from "./types.js"
-import { Session, ClosedError } from "./session.js"
+import { Session, ClosedError, createCallProxy } from "./session.js"
 import { log } from "./logger.js"
 
 export interface ClientOptions extends SessionOptions {
@@ -95,14 +95,9 @@ export function createClientCore<R = any>(
     middleware: options.middleware,
   }
 
-  const remote = new Proxy(Object.create(null), {
-    get(_t, action: string) {
-      return (payload: unknown, opts?: CallOptions) =>
-        session
-          ? session.call(action, payload, opts)
-          : Promise.reject(new ClosedError())
-    },
-  }) as R
+  const remote = createCallProxy<R>((action, payload, opts) =>
+    session ? session.call(action, payload, opts) : Promise.reject(new ClosedError()),
+  )
 
   function scheduleReconnect(): void {
     if (intentionalClose || !options.reconnect || reconnectScheduled) return

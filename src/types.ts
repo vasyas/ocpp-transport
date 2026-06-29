@@ -43,6 +43,12 @@ export interface ConnectionContext {
   id: string
   /** Negotiated WebSocket subprotocol, if any (e.g. "ocpp1.6"). */
   protocol?: string
+  /**
+   * The OCPP action being processed. Present only on the per-call context
+   * passed to local middleware and inbound handlers (so middleware can label
+   * by operation) — not on the persistent connection context.
+   */
+  action?: string
   [key: string]: unknown
 }
 
