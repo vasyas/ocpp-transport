@@ -38,6 +38,12 @@ export { nodeClientSocket } from "./socket/nodeClient.js"
 export { browserClientSocket } from "./socket/browserClient.js"
 export type { UpgradeDecision, UpgradeHook } from "./types.js"
 
+export { createClient } from "./client.js"
+export type { Client, ClientOptions } from "./client.js"
+export { createServer } from "./server.js"
+export type { Server, ServerOptions } from "./server.js"
+export { TimeoutError, ClosedError } from "./session.js"
+
 // Public surface added by later units:
 //   export { createClient } from "./client.js"
 //   export { createServer } from "./server.js"
