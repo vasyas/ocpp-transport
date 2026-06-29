@@ -33,7 +33,8 @@ export {
   defaultMessageSerializer,
 } from "./codec.js"
 
+export { composeMiddleware } from "./middleware.js"
+
 // Public surface added by later units:
-//   export { composeMiddleware } from "./middleware.js"
 //   export { createClient } from "./client.js"
 //   export { createServer } from "./server.js"
