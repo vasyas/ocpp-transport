@@ -42,7 +42,10 @@ export const defaultMessageSerializer: MessageSerializer = (frame) =>
   JSON.stringify(frame)
 
 function byteLength(s: string): number {
-  return new TextEncoder().encode(s).length
+  // Buffer.byteLength avoids the allocation TextEncoder.encode() makes on
+  // every frame; fall back to TextEncoder in the browser.
+  const B = (globalThis as { Buffer?: { byteLength(s: string): number } }).Buffer
+  return B ? B.byteLength(s) : new TextEncoder().encode(s).length
 }
 
 export interface DecodeOptions {

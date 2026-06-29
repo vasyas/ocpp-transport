@@ -1,7 +1,7 @@
 ---
 title: "feat: ocpp-transport — OCPP-J WebSocket transport library"
 type: feat
-status: active
+status: completed
 date: 2026-06-29
 origin: docs/brainstorms/2026-06-29-ocpp-transport-requirements.md
 ---

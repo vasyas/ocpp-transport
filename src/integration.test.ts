@@ -112,6 +112,19 @@ describe("U9: upgrade rejection", () => {
     const c = connect(port, "/nope", { reconnect: false })
     await expect(c.connected).rejects.toMatchObject({ status: 403 })
   })
+
+  it("surfaces the rejection and retries (does not hang) when reconnect is on", async () => {
+    const port = await start(() => ({ ok: false, status: 503, message: "Busy" }))
+    const seen: number[] = []
+    connect(port, "/retry", {
+      reconnect: true,
+      reconnectDelay: 30,
+      onUpgradeRejected: (status) => seen.push(status),
+    })
+    await new Promise((r) => setTimeout(r, 150))
+    expect(seen.length).toBeGreaterThanOrEqual(2) // observed + retried
+    expect(seen.every((s) => s === 503)).toBe(true)
+  })
 })
 
 describe("F3: reconnect after drop", () => {

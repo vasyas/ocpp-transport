@@ -34,7 +34,11 @@ function writeReject(
   status: number,
   message?: string,
 ): void {
-  const text = message ?? DEFAULT_STATUS_TEXT[status] ?? "Error"
+  // Strip CR/LF so a hook-supplied message cannot inject response headers.
+  const text = (message ?? DEFAULT_STATUS_TEXT[status] ?? "Error").replace(
+    /[\r\n]/g,
+    " ",
+  )
   socket.write(
     `HTTP/1.1 ${status} ${text}\r\nConnection: close\r\nContent-Length: 0\r\n\r\n`,
   )

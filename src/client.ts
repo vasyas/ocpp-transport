@@ -61,6 +61,7 @@ export function createClient<R = any>(options: ClientOptions): Client<R> {
   let session: Session | null = null
   let intentionalClose = false
   let firstAttemptPending = true
+  let reconnectScheduled = false
 
   let resolveConnected!: () => void
   let rejectConnected!: (err: unknown) => void
@@ -99,9 +100,11 @@ export function createClient<R = any>(options: ClientOptions): Client<R> {
   }) as R
 
   function scheduleReconnect(): void {
-    if (intentionalClose || !options.reconnect) return
+    if (intentionalClose || !options.reconnect || reconnectScheduled) return
+    reconnectScheduled = true
     const delay = options.reconnectDelay ?? 1000
     const t = setTimeout(() => {
+      reconnectScheduled = false
       connectOnce().catch((err) => {
         log().warn("ocpp-transport: reconnect attempt failed", err)
         scheduleReconnect()
@@ -123,6 +126,11 @@ export function createClient<R = any>(options: ClientOptions): Client<R> {
             status,
           }),
         )
+      } else {
+        // A rejected handshake may not emit a `close` event, so schedule the
+        // retry here rather than relying on the disconnected listener.
+        session = null
+        scheduleReconnect()
       }
     })
 
