@@ -34,6 +34,9 @@ export {
 } from "./codec.js"
 
 export { composeMiddleware } from "./middleware.js"
+export { nodeClientSocket } from "./socket/nodeClient.js"
+export { browserClientSocket } from "./socket/browserClient.js"
+export type { UpgradeDecision, UpgradeHook } from "./types.js"
 
 // Public surface added by later units:
 //   export { createClient } from "./client.js"

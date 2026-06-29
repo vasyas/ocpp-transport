@@ -112,6 +112,27 @@ export type ClientSocketFactory = (
   protocols?: string | string[],
 ) => Socket
 
+/**
+ * The app-owned upgrade decision (server). Accepting returns the connection
+ * context (identity + chosen subprotocol); rejecting returns an HTTP status
+ * written to the response before the socket is established. This is the
+ * application's authentication/authorization boundary — the library
+ * authenticates nothing itself.
+ */
+export type UpgradeDecision =
+  | { ok: true; context: ConnectionContext; subprotocol?: string }
+  | { ok: false; status: number; message?: string }
+
+/**
+ * Runs at the WebSocket handshake. Receives the raw HTTP upgrade request
+ * (headers, url) and decides accept-or-reject. Async so it can consult a
+ * database, validate a token, or check rate limits.
+ */
+export type UpgradeHook = (req: {
+  url?: string
+  headers: Record<string, string | string[] | undefined>
+}) => UpgradeDecision | Promise<UpgradeDecision>
+
 /** Tuning shared by client and server sessions. */
 export interface SessionOptions {
   /** Default per-call timeout in ms (covers queue-wait). Default 30000. */
