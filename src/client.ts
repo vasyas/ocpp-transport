@@ -40,6 +40,13 @@ export interface Client<R = any> {
   close(): void
 }
 
+/** The last non-empty path segment of an OCPP URL — the charge point id. */
+function chargePointIdFromUrl(url: string): string {
+  const path = (url.split(/[?#]/)[0] ?? url).replace(/\/+$/, "")
+  const segment = path.slice(path.lastIndexOf("/") + 1)
+  return segment || url
+}
+
 async function defaultFactory(): Promise<ClientSocketFactory> {
   const isBrowser =
     typeof window !== "undefined" &&
@@ -69,7 +76,9 @@ export function createClient<R = any>(options: ClientOptions): Client<R> {
   })
 
   const baseCtx: ConnectionContext = {
-    id: options.url,
+    // OCPP URLs end with the charge point id (e.g. wss://host/ocpp/CP001);
+    // use that last path segment as the connection label, not the full URL.
+    id: chargePointIdFromUrl(options.url),
     protocol: Array.isArray(options.protocols)
       ? options.protocols[0]
       : options.protocols,

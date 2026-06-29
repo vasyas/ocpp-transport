@@ -39,6 +39,18 @@ function connect(port: number, path: string, opts: Partial<Parameters<typeof cre
   return c
 }
 
+describe("client connection id", () => {
+  it("uses the URL's last path segment, not the full URL", async () => {
+    const port = await start(acceptAs("CPID"))
+    let clientId: string | undefined
+    const c = connect(port, "/ocpp/CPID", {
+      listeners: { connected: (ctx) => (clientId = ctx.id) },
+    })
+    await c.connected
+    expect(clientId).toBe("CPID")
+  })
+})
+
 describe("F1: inbound charger -> server handler", () => {
   it("dispatches a charger CALL to the server's local handler", async () => {
     const port = await start(acceptAs("CP1"), {
