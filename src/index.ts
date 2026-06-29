@@ -26,6 +26,12 @@ export type {
 export { MessageType } from "./types.js"
 
 export { setLogger } from "./logger.js"
+export {
+  FrameError,
+  isoDateReviver,
+  defaultMessageParser,
+  defaultMessageSerializer,
+} from "./codec.js"
 
 // Public surface added by later units:
 //   export { composeMiddleware } from "./middleware.js"
