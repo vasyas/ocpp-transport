@@ -1,13 +1,9 @@
 # ocpp-transport
 
 A small, OCPP-version-agnostic **OCPP-J** (OCPP-over-WebSocket) transport for
-Node and the browser. It provides a typed client and server with a
-push-rpc-compatible API and wire format — and nothing else. It moves
+Node and the browser. It provides a typed client and server. It moves
 `CALL` / `CALLRESULT` / `CALLERROR` frames and knows nothing about OCPP
 actions, payload schemas, or versions.
-
-It is a focused replacement for `@push-rpc/core` in OCPP projects: no
-subscriptions, no extra adapters, one package.
 
 ```bash
 # Node (server and/or client) — ws is an optional peer dependency:
@@ -73,8 +69,7 @@ ping is Node-only; the browser relies on idle-timeout liveness plus whatever
 traffic the app sends. In a Node process you can still force the browser socket
 by passing `socket: browserClientSocket`.
 
-See [`examples/`](examples) for runnable client and server, and
-[`examples/PARITY.md`](examples/PARITY.md) for the `@push-rpc/core` migration map.
+See [`examples/`](examples) for runnable client and server.
 
 ## Behavior worth knowing
 
