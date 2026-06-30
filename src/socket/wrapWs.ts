@@ -33,6 +33,9 @@ export function wrapWs(ws: WsWebSocket): Socket {
     onError(handler) {
       ws.on("error", (err: Error) => handler(err))
     },
+    onPing(handler) {
+      ws.on("ping", () => handler())
+    },
     onPong(handler) {
       ws.on("pong", () => handler())
     },

@@ -6,6 +6,7 @@ function mockSocket() {
   let openH: (() => void) | undefined
   let msgH: ((d: string) => void) | undefined
   let closeH: ((c: number, r: string) => void) | undefined
+  let pingH: (() => void) | undefined
   let pongH: (() => void) | undefined
   const sent: string[] = []
   let closed = false
@@ -21,6 +22,7 @@ function mockSocket() {
     onMessage: (h) => (msgH = h),
     onClose: (h) => (closeH = h),
     onError: () => {},
+    onPing: (h) => (pingH = h),
     onPong: (h) => (pongH = h),
   }
   return {
@@ -29,6 +31,7 @@ function mockSocket() {
     fireOpen: () => openH?.(),
     inbound: (frame: unknown[]) => msgH?.(JSON.stringify(frame)),
     inboundRaw: (raw: string) => msgH?.(raw),
+    firePing: () => pingH?.(),
     firePong: () => pongH?.(),
     get closed() {
       return closed
@@ -204,6 +207,17 @@ describe("session keep-alive (AE3, F4)", () => {
     m.fireOpen()
     await vi.advanceTimersByTimeAsync(800)
     m.inbound([MessageType.Call, "hb", "Heartbeat", {}]) // resets activity
+    await vi.advanceTimersByTimeAsync(800)
+    expect(m.closed).toBe(false)
+  })
+
+  it("stays alive on inbound WS pings alone (no OCPP frames)", async () => {
+    vi.useFakeTimers()
+    const m = mockSocket()
+    new Session(m.socket, ctx, { keepAliveTimeout: 1000, local: {} })
+    m.fireOpen()
+    await vi.advanceTimersByTimeAsync(800)
+    m.firePing() // a charger keeping the socket alive purely via WS pings
     await vi.advanceTimersByTimeAsync(800)
     expect(m.closed).toBe(false)
   })

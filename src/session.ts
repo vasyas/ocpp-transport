@@ -100,6 +100,13 @@ export class Session {
     socket.onMessage((data) => this.handleMessage(data))
     socket.onClose((code, reason) => this.handleClose(code, reason))
     socket.onError((err) => log().warn("ocpp-transport: socket error", err))
+    // Inbound ping/pong both count as liveness. Many chargers keep an otherwise
+    // idle socket alive with WS pings while their OCPP message gap exceeds
+    // keepAliveTimeout; without treating pings as activity they would be closed
+    // as "idle" despite a healthy connection.
+    socket.onPing?.(() => {
+      this.lastActivity = Date.now()
+    })
     socket.onPong?.(() => {
       this.lastActivity = Date.now()
     })

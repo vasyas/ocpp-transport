@@ -101,6 +101,8 @@ export interface Socket {
   onMessage(handler: (data: string) => void): void
   onClose(handler: (code: number, reason: string) => void): void
   onError(handler: (err: Error) => void): void
+  /** Native ping received from the peer (Node only). */
+  onPing?(handler: () => void): void
   /** Native pong received (Node only). */
   onPong?(handler: () => void): void
   /**
